@@ -4,8 +4,14 @@ import matter from "gray-matter";
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
+type PostMetaData = {
+  title: string;
+  date: string;
+  thumbnail: string;
+};
+
 // mdファイルのデータを取り出す
-export const getPostsData = () => {
+export const getPostsData = (): PostMetaData[] => {
   const fileNames = fs.readdirSync(postsDirectory);
   const allPostsData = fileNames.map((fileName) => {
     const id = fileName.replace(/\.md$/, "");
@@ -14,10 +20,13 @@ export const getPostsData = () => {
     const fileContents = fs.readFileSync(fullPath, "utf8");
 
     const matterResult = matter(fileContents);
+    // matterResult.dataに型アサーションを使用
+    const metaData = matterResult.data as PostMetaData;
 
     return {
       id,
-      ...matterResult,
+      ...metaData,
     };
   });
+  return allPostsData;
 };

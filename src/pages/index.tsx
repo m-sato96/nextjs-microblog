@@ -2,11 +2,30 @@ import { Inter } from "next/font/google";
 import Head from "next/head";
 import Layout from "@/components/Layout";
 import Link from "next/link";
-import Image from "next/image";
+import { getPostsData } from "@/lib/post";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+type Post = {
+  id: string;
+  title: string;
+  date: string;
+  thumbnail: string;
+};
+type Props = {
+  allPostsData: Post[];
+};
+
+// SSGの場合
+export const getStaticProps = async () => {
+  const allPostsData = getPostsData();
+  return {
+    props: {
+      allPostsData,
+    },
+  };
+};
+export default function Home({ allPostsData }: Props) {
   return (
     <>
       <Head>
@@ -14,41 +33,15 @@ export default function Home() {
       </Head>
       <Layout>
         <div className="grid grid-cols-3 gap-2.5 gap-y-5">
-          <article className="w-[300px] mx-auto">
-            <Link href="/">
-              <img className="mb-2  rounded-sm" src="https://picsum.photos/300/300"></img>
-              <p>初めまして</p>
-              <small>2024/01/01</small>
-            </Link>
-          </article>
-          <article className="w-[300px] mx-auto">
-            <Link href="/">
-              <img className="mb-2  rounded-sm" src="https://picsum.photos/300/300"></img>
-              <p>Next.jsを使ってBlogを開発しました</p>
-              <small>2024/02/12</small>
-            </Link>
-          </article>
-          <article className="w-[300px] mx-auto">
-            <Link href="/">
-              <img className="mb-2  rounded-sm" src="https://picsum.photos/300/300"></img>
-              <p>転職しました。</p>
-              <small>2024/02/19</small>
-            </Link>
-          </article>
-          <article className="w-[300px] mx-auto">
-            <Link href="/">
-              <img className="mb-2  rounded-sm" src="https://picsum.photos/300/300"></img>
-              <p>OpenAPIを使用してインタラクティブなAPI定義を作成する方法</p>
-              <small>2024/02/19</small>
-            </Link>
-          </article>
-          <article className="w-[300px] mx-auto">
-            <Link href="/">
-              <img className="mb-2  rounded-sm" src="https://picsum.photos/300/300"></img>
-              <p>GithubActionsでフロント自動テスト環境を整備する手順</p>
-              <small>2024/03/01</small>
-            </Link>
-          </article>
+          {allPostsData.map(({ id, title, date, thumbnail }) => (
+            <article key={id} className="w-[300px] mx-auto">
+              <Link href={`/posts/${id}`}>
+                <img className="mb-2 rounded-sm" src="https://picsum.photos/300/300" alt={title} />
+                <p>{title}</p>
+                <small>{date}</small>
+              </Link>
+            </article>
+          ))}
         </div>
       </Layout>
     </>
